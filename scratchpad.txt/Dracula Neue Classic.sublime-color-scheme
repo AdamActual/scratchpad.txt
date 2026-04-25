@@ -1,0 +1,96 @@
+{
+    "rules": [
+        // Done: x note
+        {
+            "scope": "meta.done.scratchpad",
+            "foreground": "var(comment)",
+            "font_style": "italic"
+        },
+        // Headings
+        {
+            "scope": "markup.heading.scratchpad",
+            "background": "color(var(background) blend(#000 85%))"
+        },
+        {
+            "scope": "entity.name.section.scratchpad",
+            "foreground": "var(cyan)",
+            "font_style": "glow stippled_underline"
+        },
+        {
+            "scope": "punctuation.definition.comment.scratchpad",
+            "foreground": "var(comment)",
+            "font_style": "normal"
+        },
+        // List markers
+        {
+            "scope": "punctuation.definition.list.scratchpad",
+            "foreground": "var(pink)"
+        },
+        // Progress: \ note
+        {
+            "scope": "meta.progress.scratchpad",
+            "background": "color(var(background) blend(#8888FF 70%))"
+        },
+        {
+            "scope": "punctuation.definition.progress.scratchpad",
+            "font_style": "bold"
+        },
+        // Priority: ! note
+        {
+            "scope": "meta.priority.scratchpad",
+            "background": "color(var(background) blend(#FF0000 90%))"
+        },
+        {
+            "scope": "punctuation.definition.priority.scratchpad",
+            "foreground": "var(red)",
+            "font_style": "bold"
+        },
+        // Blockquote: > note
+        {
+            "scope": "markup.quote.scratchpad",
+            "foreground": "var(yellow)"
+        },
+        {
+            "scope": "punctuation.definition.quote.begin.scratchpad",
+            "foreground": "var(yellow)"
+        },
+        // Indented line
+        {
+            "scope": "meta.indentation.scratchpad",
+            "foreground": "color(var(foreground) blend(#000 75%))"
+        },
+        {
+            "scope": "punctuation.whitespace.indent.scratchpad",
+            "background": "color(var(background) blend(#000 95%))",
+            "foreground": "color(var(foreground) alpha(0.1))",
+            "font_style": "stippled_underline"
+        },
+        // References: @Reference
+        {
+            "scope": "variable.other.reference.scratchpad",
+            "foreground": "var(pink)",
+            "font_style": "glow"
+        },
+        // Tags: #tag
+        {
+            "scope": "keyword.other.tag.scratchpad",
+            "foreground": "var(purple)",
+            "font_style": "italic"
+        },
+        // Dates
+        {
+            "scope": "constant.other.date.scratchpad",
+            "foreground": "var(pink)"
+        },
+        // Days
+        {
+            "scope": "constant.other.day.scratchpad",
+            "foreground": "var(green)"
+        },
+        // Times
+        {
+            "scope": "constant.other.time.scratchpad",
+            "foreground": "var(green)"
+        }
+    ]
+}

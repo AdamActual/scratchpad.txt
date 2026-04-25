@@ -1,0 +1,153 @@
+%YAML 1.2
+---
+name: scratchpad.txt
+file_extensions:
+  - scratch
+scope: text.scratchpadtxt
+version: 2
+variables:
+  day: '\b(?:monday|mon|tuesday|tues|tue|wednesday|wed|thursday|thurs|thu|friday|fri|saturday|sat|sunday|sun)\b'
+  month: '(?i)(?:january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sept|sep|october|oct|november|nov|december|dec)'
+  ordinal: '(?:st|nd|rd|th)'
+  tld: '(?:com|net|org|io|co|dev|app|ai|gov|edu|au|uk|ca|de|fr|nl|se|no|nz|ie|jp|ch|it|es|br|in|ru|cn|kr|tw|sg|hk|me|xyz|info|biz|tv|cc|gg|to|sh|fm|so|us)'
+contexts:
+  main:
+    # Done: x note
+    - match: '^([ \t]*)x[ \t]'
+      captures:
+        1: punctuation.whitespace.indent.scratchpad
+      push: done
+
+    # Heading (INI): [Heading]
+    - match: '^([ \t]*)(\[)(.*)(\])(?:[ \t]*)(\/\/.*)?\n'
+      scope: markup.heading.scratchpad
+      captures:
+        1: punctuation.whitespace.indent.scratchpad
+        2: punctuation.definition.heading.begin.scratchpad
+        3: entity.name.section.scratchpad
+        4: punctuation.definition.heading.end.scratchpad
+        5: punctuation.definition.comment.scratchpad
+
+    # Heading (markdown): # Heading
+    - match: '^([ \t]*)(#{1,6})(?:[ \t]+)(.*?)(?:[ \t]*(\/\/.*))?\n'
+      scope: markup.heading.scratchpad
+      captures:
+        1: punctuation.whitespace.indent.scratchpad
+        2: punctuation.definition.heading.begin.scratchpad
+        3: entity.name.section.scratchpad
+        4: punctuation.definition.comment.scratchpad
+
+    # Progress: \ note
+    - match: '^([ \t]*)(\\)[ \t]*([-*+]|\d+\.(?=[ \t]))?[ \t]*(!+)?'
+      captures:
+        1: punctuation.whitespace.indent.scratchpad
+        2: punctuation.definition.progress.scratchpad
+        3: punctuation.definition.list.scratchpad
+        4: punctuation.definition.priority.scratchpad
+      push:
+        - meta_scope: meta.progress.scratchpad
+        - include: line
+
+    # Priority: ! note
+    - match: '^([ \t]*)([-*+]|\d+\.(?=[ \t]))?[ \t]*(!+)'
+      captures:
+        1: punctuation.whitespace.indent.scratchpad
+        2: punctuation.definition.list.scratchpad
+        3: punctuation.definition.priority.scratchpad
+      push:
+        - meta_scope: meta.priority.scratchpad
+        - include: line
+
+    # Blockquote: > note
+    - match: '^([ \t]*)([-*+]|\d+\.(?=[ \t]))?[ \t]*(>)[ \t]*'
+      captures:
+        1: punctuation.whitespace.indent.scratchpad
+        2: punctuation.definition.list.scratchpad
+        3: punctuation.definition.quote.begin.scratchpad
+      push:
+        - meta_scope: markup.quote.scratchpad
+        - include: line
+
+    # Indented line
+    - match: '^([ \t]+)([-*+]|\d+\.(?=[ \t]))?'
+      captures:
+        1: punctuation.whitespace.indent.scratchpad
+        2: punctuation.definition.list.scratchpad
+      push:
+        - meta_scope: meta.indentation.scratchpad
+        - include: line
+
+    # Non-indented line
+    - match: '^(?=\S)([-*+]|\d+\.(?=[ \t]))?'
+      captures:
+        1: punctuation.definition.list.scratchpad
+      push:
+        - include: line
+
+  done:
+    - meta_scope: meta.done.scratchpad
+    - match: '^(?!\1[ \t]+)'
+      pop: true
+    - match: ^(?=\S)
+      pop: true
+
+  line:
+    # Comments: // text
+    - match: '(?<=\s|^)\/\/.*'
+      scope: comment.line.double-slash.scratchpad
+
+    # Double quotes (with escaping)
+    - match: '"'
+      push:
+        - meta_scope: string.quoted.double.scratchpad
+        - match: '\\.'
+          scope: constant.character.escape.scratchpad
+        - match: '"'
+          pop: true
+        - include: formatting
+
+    # Emails
+    - match: '\b[\w.%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
+      scope: markup.underline.link.scratchpad
+
+    # URLs
+    - match: '\b(?:https?://)?(?:www\.[\w-]+(?:\.[\w-]+)*(?:\.[a-zA-Z]{2,})|[\w-]+(?:\.[\w-]+)*\.{{tld}}(?:\.[a-z]{2})?)(?::\d+)?(?:/[^\s]*)?'
+      scope: markup.underline.link.scratchpad
+
+    # References: @Reference
+    - match: '(?<!\w)@[\w-]+'
+      scope: variable.other.reference.scratchpad
+
+    # Tags: #tag
+    - match: '(?<!\w)#[\w-]+'
+      scope: keyword.other.tag.scratchpad
+
+    # Dates: 16 Aug, 16 Aug 2026, 2026-08-16 (YYYY-MM-DD)
+    - match: '\b(?:20\d{2}-\d{2}-\d{2}|(?:\d{1,2}{{ordinal}}?(?:[ \t]+of)?[ \t]*)?{{month}}(?:[ \t]*(?:\d{1,2}{{ordinal}}?|20\d{2}))?|\d{1,2}{{ordinal}})\b'
+      scope: constant.other.date.scratchpad
+
+    # Days: [last|next|this|...] Monday
+    - match: '(?i)(?:(?:last|next|this|every|each|coming|following|previous|prev)[ \t]+)?{{day}}'
+      scope: constant.other.day.scratchpad
+
+    # Times: 21:00, 9pm
+    - match: '(?i)\b(?:\d{1,2}(?::\d{2})?[ \t]?(?:[ap]m)|(?:[01]\d|2[0-3]):[0-5]\d)\b'
+      scope: constant.other.time.scratchpad
+
+    # Numbers
+    - match: '\b-?(?:\d+(?:\.\d+)?|\.\d+)\b'
+      scope: constant.numeric.scratchpad
+
+    - include: formatting
+
+    - match: \n
+      pop: true
+
+  formatting:
+    # Bold
+    - match: '\*\*(?=\S)(?:[^*"\\\n]|\*(?!\*))*?\S\*\*'
+      scope: markup.bold.scratchpad
+
+    # Italic
+    - match: '(?<!\w)_(?=\S)(?:[^_"\\\n])*?\S_(?!\w)'
+      scope: markup.italic.scratchpad
